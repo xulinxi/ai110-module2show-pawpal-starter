@@ -9,6 +9,8 @@ classDiagram
         +available_start: time
         +available_end: time
         +preferences: str
+        +pets: list
+        +tasks: list
         +get_available_minutes() int
         +is_available(at_time) bool
         +get_constraints() dict
@@ -28,12 +30,13 @@ classDiagram
         +duration_minutes: int
         +priority: int
         +preferred_time: time
+        +pet_id: str
         +get_duration_minutes() int
         +to_dict() dict
     }
 
     class Scheduler {
-        +generate_plan(tasks, owner, date) list
+        +generate_plan(tasks, owner, date, pet) list
         -_sort_by_priority(tasks) list
         -_fit_into_windows(tasks, start, end) list
         +explain_plan(scheduled_items) str
@@ -43,6 +46,7 @@ classDiagram
     Owner "1" --> "*" Task : has
     Scheduler ..> Task : uses
     Scheduler ..> Owner : uses
+    Scheduler ..> Pet : uses
 ```
 
 ## How to view

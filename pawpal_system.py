@@ -4,19 +4,26 @@ Data-holding objects (Owner, Pet, Task) use dataclasses: the decorator generates
 __repr__, and other boilerplate from the declared attributes, keeping the code clean.
 """
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import date, time
 from typing import Any
+
+# Priority: lower number = higher priority (e.g. 1=high, 2=medium, 3=low). Used by Scheduler._sort_by_priority.
+PRIORITY_HIGH = 1
+PRIORITY_MEDIUM = 2
+PRIORITY_LOW = 3
 
 
 @dataclass
 class Owner:
-    """Pet owner; holds availability and preferences for scheduling."""
+    """Pet owner; holds availability, preferences, and their pets and tasks."""
 
     name: str
     available_start: time
     available_end: time
     preferences: str = ""
+    pets: list["Pet"] = field(default_factory=list)
+    tasks: list["Task"] = field(default_factory=list)
 
     def get_available_minutes(self) -> int:
         """Return total minutes available in the day."""
@@ -49,7 +56,7 @@ class Pet:
 
 @dataclass
 class Task:
-    """A single care activity (e.g. walk, feeding, meds)."""
+    """A single care activity (e.g. walk, feeding, meds). May be linked to a pet when multiple pets exist."""
 
     id: str
     name: str
@@ -57,6 +64,7 @@ class Task:
     duration_minutes: int
     priority: int
     preferred_time: time | None = None
+    pet_id: str | None = None
 
     def get_duration_minutes(self) -> int:
         """Return the task duration in minutes."""
@@ -71,9 +79,13 @@ class Scheduler:
     """Produces a daily plan from tasks and owner constraints."""
 
     def generate_plan(
-        self, tasks: list[Task], owner: Owner, plan_date: date
+        self,
+        tasks: list[Task],
+        owner: Owner,
+        plan_date: date,
+        pet: Pet | None = None,
     ) -> list[Any]:
-        """Return an ordered list of scheduled items (task + time slot)."""
+        """Return an ordered list of scheduled items (task + time slot). Optional pet for pet-aware scheduling."""
         pass
 
     def _sort_by_priority(self, tasks: list[Task]) -> list[Task]:

@@ -7,21 +7,31 @@
 - Briefly describe your initial UML design.
 - What classes did you include, and what responsibilities did you assign to each?
 
-The initial UML design models the main concepts from the scenario: who is planning (owner), what is being cared for (pet), what needs to be done (tasks), and how a plan is produced (scheduler).
+The initial UML design models the main concepts from the scenario: who is planning (owner), what is being cared for (pet), what needs to be done (tasks), and how a plan is produced (scheduler). Four classes were chosen so that data (owner, pet, tasks) is separate from the logic that builds the daily plan (scheduler).
 
-Classes and responsibilities:
+**Classes and responsibilities**
 
-- **Owner** — Holds basic owner info (e.g., name, time available) and owns one or more pets. Responsible for providing constraints the scheduler will use.
-- **Pet** — Represents the pet (name, species/type). Linked to an owner; the care plan is for this pet.
-- **Task** — Represents a single care activity (e.g., walk, feeding, meds). Has at least duration and priority; may have type, preferred time, or other fields. Can be added, edited, or removed.
-- **Scheduler** — Takes the set of tasks plus owner/pet constraints (time available, priorities, preferences) and produces a daily plan (e.g. an ordered list of scheduled items with time slots and optional reasoning). Responsible for ordering and timing tasks and optionally explaining why it chose that plan.
+- **Owner** — Holds basic owner info: name, available time window (start/end), and preferences. Responsibilities: expose how many minutes are available (`get_available_minutes`), check if a given time is within the window (`is_available`), and return constraints for the scheduler (`get_constraints`).
+- **Pet** — Holds the pet’s name and species. Responsibilities: provide a string representation (`__str__`) and optional care notes (`get_care_notes`). The care plan is for this pet.
+- **Task** — Represents a single care activity (e.g. walk, feeding, meds). Holds id, name, task type, duration, priority, and optional preferred time. Responsibilities: return duration (`get_duration_minutes`) and serialize for storage or UI (`to_dict`). Tasks can be added, edited, or removed by the app.
+- **Scheduler** — No stored data; it’s the behavior class. Responsibilities: take the list of tasks and the owner (for constraints) and produce a daily plan as an ordered list of scheduled items (`generate_plan`), using internal helpers to sort by priority and fit tasks into time windows. It can also explain why the plan was built that way (`explain_plan`).
 
-Relationships: Owner has one or more Pets; Owner (or Pet) has many Tasks; Scheduler uses Tasks and constraints to produce the plan output.
+**Relationships:** Owner has one or more Pets; Owner has many Tasks; Scheduler uses Task and Owner to produce the plan output (a list of scheduled items).
 
 **b. Design changes**
 
 - Did your design change during implementation?
 - If yes, describe at least one change and why you made it.
+
+Yes. Several changes were made to encode missing relationships and avoid logic ambiguity:
+
+1. **Owner now holds `pets` and `tasks`** — The UML said "Owner has one or more Pets" and "Owner has many Tasks," but the code didn’t model that; the caller held those lists. We added `pets: list[Pet]` and `tasks: list[Task]` to `Owner` (with `default_factory=list`) so the relationship lives in the domain model. The app can still pass a task list into the scheduler (e.g. `owner.tasks` or a filtered list).
+
+2. **Task now has optional `pet_id`** — Tasks weren’t linked to a pet, so with multiple pets we couldn’t say which pet a task is for. We added `pet_id: str | None = None` to `Task` so tasks can be associated with a pet when needed; scheduling or the UI can use this for pet-specific plans.
+
+3. **Scheduler.generate_plan now accepts optional `pet`** — The scheduler had no way to use pet info (e.g. species or care notes). We added an optional `pet: Pet | None = None` parameter so the scheduler can do pet-aware scheduling when provided, without breaking the existing API when omitted.
+
+4. **Priority constants (PRIORITY_HIGH, PRIORITY_MEDIUM, PRIORITY_LOW)** — Priority was an unspecified integer, so sort order (ascending vs descending) was ambiguous. We added module-level constants and documented that lower number means higher priority, so `_sort_by_priority` and any UI use a single, clear convention.
 
 ---
 
