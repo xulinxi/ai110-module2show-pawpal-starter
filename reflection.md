@@ -7,6 +7,17 @@
 - Briefly describe your initial UML design.
 - What classes did you include, and what responsibilities did you assign to each?
 
+The initial UML design models the main concepts from the scenario: who is planning (owner), what is being cared for (pet), what needs to be done (tasks), and how a plan is produced (scheduler).
+
+Classes and responsibilities:
+
+- **Owner** — Holds basic owner info (e.g., name, time available) and owns one or more pets. Responsible for providing constraints the scheduler will use.
+- **Pet** — Represents the pet (name, species/type). Linked to an owner; the care plan is for this pet.
+- **Task** — Represents a single care activity (e.g., walk, feeding, meds). Has at least duration and priority; may have type, preferred time, or other fields. Can be added, edited, or removed.
+- **Scheduler** — Takes the set of tasks plus owner/pet constraints (time available, priorities, preferences) and produces a daily plan (e.g. an ordered list of scheduled items with time slots and optional reasoning). Responsible for ordering and timing tasks and optionally explaining why it chose that plan.
+
+Relationships: Owner has one or more Pets; Owner (or Pet) has many Tasks; Scheduler uses Tasks and constraints to produce the plan output.
+
 **b. Design changes**
 
 - Did your design change during implementation?
