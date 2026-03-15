@@ -12,11 +12,11 @@ The initial UML design models the main concepts from the scenario: who is planni
 **Classes and responsibilities**
 
 - **Owner** — Holds basic owner info: name, available time window (start/end), and preferences. Responsibilities: expose how many minutes are available (`get_available_minutes`), check if a given time is within the window (`is_available`), and return constraints for the scheduler (`get_constraints`).
-- **Pet** — Holds the pet’s name and species. Responsibilities: provide a string representation (`__str__`) and optional care notes (`get_care_notes`). The care plan is for this pet.
-- **Task** — Represents a single care activity (e.g. walk, feeding, meds). Holds id, name, task type, duration, priority, and optional preferred time. Responsibilities: return duration (`get_duration_minutes`) and serialize for storage or UI (`to_dict`). Tasks can be added, edited, or removed by the app.
+- **Pet** — Holds the pet’s id (stable identifier), name, and species. Responsibilities: provide a string representation (`__str__`) and optional care notes (`get_care_notes`). The care plan is for this pet. Task.pet_id references Pet.id when a task is for a specific pet.
+- **Task** — Represents a single care activity (e.g. walk, feeding, meds). Holds id, name, task type, duration, priority, optional preferred time, and optional pet_id (references Pet.id). Responsibilities: return duration (`get_duration_minutes`) and serialize for storage or UI (`to_dict`). Tasks can be added, edited, or removed by the app.
 - **Scheduler** — No stored data; it’s the behavior class. Responsibilities: take the list of tasks and the owner (for constraints) and produce a daily plan as an ordered list of scheduled items (`generate_plan`), using internal helpers to sort by priority and fit tasks into time windows. It can also explain why the plan was built that way (`explain_plan`).
 
-**Relationships:** Owner has one or more Pets; Owner has many Tasks; Scheduler uses Task and Owner to produce the plan output (a list of scheduled items).
+**Relationships:** Owner has one or more Pets; Owner has many Tasks; Task optionally references one Pet via pet_id (Task.pet_id = Pet.id); Scheduler uses Task, Owner, and optionally Pet to produce the plan output (a list of scheduled items).
 
 **b. Design changes**
 
@@ -32,6 +32,8 @@ Yes. Several changes were made to encode missing relationships and avoid logic a
 3. **Scheduler.generate_plan now accepts optional `pet`** — The scheduler had no way to use pet info (e.g. species or care notes). We added an optional `pet: Pet | None = None` parameter so the scheduler can do pet-aware scheduling when provided, without breaking the existing API when omitted.
 
 4. **Priority constants (PRIORITY_HIGH, PRIORITY_MEDIUM, PRIORITY_LOW)** — Priority was an unspecified integer, so sort order (ascending vs descending) was ambiguous. We added module-level constants and documented that lower number means higher priority, so `_sort_by_priority` and any UI use a single, clear convention.
+
+5. **Pet now has `id`; Task–Pet relationship explicit in diagram** — Pet had no identifier, so Task.pet_id had no clear target and the relationship was one-sided. We added `id: str` to Pet so every pet has a stable id and Task.pet_id references it. The class diagram was updated to show Pet.id and the relationship "Task pet_id → Pet" so the link is visible.
 
 ---
 

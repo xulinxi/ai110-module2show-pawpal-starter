@@ -17,6 +17,7 @@ classDiagram
     }
 
     class Pet {
+        +id: str
         +name: str
         +species: str
         +__str__() str
@@ -44,6 +45,7 @@ classDiagram
 
     Owner "1" --> "*" Pet : has
     Owner "1" --> "*" Task : has
+    Task "*" --> "0..1" Pet : pet_id
     Scheduler ..> Task : uses
     Scheduler ..> Owner : uses
     Scheduler ..> Pet : uses

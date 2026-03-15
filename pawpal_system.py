@@ -40,8 +40,9 @@ class Owner:
 
 @dataclass
 class Pet:
-    """Represents a pet (name, species)."""
+    """Represents a pet. id is the stable identifier; task.pet_id references this."""
 
+    id: str
     name: str
     species: str
 
