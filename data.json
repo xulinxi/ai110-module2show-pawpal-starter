@@ -1,0 +1,59 @@
+{
+  "name": "Jordan",
+  "available_start": "08:00:00",
+  "available_end": "18:00:00",
+  "preferences": "",
+  "pets": [
+    {
+      "id": "pet_1",
+      "name": "Mochi",
+      "species": "dog",
+      "care_notes": "",
+      "tasks": []
+    },
+    {
+      "id": "pet_2",
+      "name": "Mochi",
+      "species": "dog",
+      "care_notes": "",
+      "tasks": [
+        {
+          "id": "task_1",
+          "name": "Morning walk",
+          "description": "Morning walk",
+          "task_type": "walk",
+          "duration_minutes": 20,
+          "priority": 1,
+          "preferred_time": "09:00:00",
+          "pet_id": "pet_2",
+          "frequency": "daily",
+          "completion_status": true
+        },
+        {
+          "id": "task_1_next",
+          "name": "Morning walk",
+          "description": "Morning walk",
+          "task_type": "walk",
+          "duration_minutes": 20,
+          "priority": 1,
+          "preferred_time": "09:00:00",
+          "pet_id": "pet_2",
+          "frequency": "daily",
+          "completion_status": true
+        },
+        {
+          "id": "task_1_next_next",
+          "name": "Morning walk",
+          "description": "Morning walk",
+          "task_type": "walk",
+          "duration_minutes": 20,
+          "priority": 1,
+          "preferred_time": "09:00:00",
+          "pet_id": "pet_2",
+          "frequency": "daily",
+          "completion_status": false
+        }
+      ]
+    }
+  ]
+}
